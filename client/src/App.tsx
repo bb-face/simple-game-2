@@ -7,6 +7,7 @@ import { Models, Schema } from "./bindings.ts";
 import { useDojo } from "./useDojo.tsx";
 import useModel from "./useModel.tsx";
 import { useSystemCalls } from "./useSystemCalls.ts";
+import { Grid } from "./components/Grid.tsx";
 
 /**
  * Global store for managing Dojo game state.
@@ -175,7 +176,11 @@ function App({ sdk }: { sdk: SDK<Schema> }) {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="bg-gray-700 p-4 rounded-lg shadow-inner flex justify-center items-center">
+          <Grid position={position} treasure={treasurePosition} />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
           <div className="bg-gray-700 p-4 rounded-lg shadow-inner">
             <div className="grid grid-cols-3 gap-2 w-full h-48">
               <div className="col-start-2">
