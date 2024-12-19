@@ -1,0 +1,7 @@
+/tmp
+
+/client/node_modules
+
+/contract/.github
+/contract/.vscode
+/contract/tmp
