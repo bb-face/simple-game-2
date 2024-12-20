@@ -32,6 +32,7 @@ pub mod actions {
         pub player: ContractAddress,
         //  pub treasure_position: TreasurePosition,
         pub treasure_position: Vec2,
+        pub timestamp: u64,
     }
 
     #[abi(embed_v0)]
@@ -67,13 +68,7 @@ pub mod actions {
 
             // Write the new moves to the world.
             world.write_model(@moves);
-            // world.emit_event(@TreasureFound { player, treasure_position });
-            world
-                .emit_event(
-                    @TreasureFound { player, treasure_position: new_treasure_position.vec }
-                );
-            // world.emit_event(@TreasureFound { player, treasure_position: Vec2 { x: 11, y: 11 }
-        // });
+            // });
         }
 
         // Implementation of the move function for the ContractState struct.
@@ -86,6 +81,7 @@ pub mod actions {
 
             // Retrieve the player's current position and moves data from the world.
             let position: Position = world.read_model(player);
+            let treasure_position: TreasurePosition = world.read_model(player);
             let mut moves: Moves = world.read_model(player);
 
             // Deduct one from the player's remaining moves.
@@ -105,6 +101,17 @@ pub mod actions {
 
             // Emit an event to the world to notify about the player's move.
             world.emit_event(@Moved { player, direction });
+
+            if (next.vec.x == treasure_position.vec.x && next.vec.y == treasure_position.vec.y) {
+                world
+                    .emit_event(
+                        @TreasureFound {
+                            player,
+                            treasure_position: treasure_position.vec,
+                            timestamp: starknet::get_block_timestamp()
+                        }
+                    );
+            }
         }
     }
 

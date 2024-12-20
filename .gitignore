@@ -5,3 +5,5 @@
 /contract/.github
 /contract/.vscode
 /contract/tmp
+
+/contract/.env.sepolia

@@ -8,6 +8,7 @@ import { useDojo } from "./useDojo.tsx";
 import useModel from "./useModel.tsx";
 import { useSystemCalls } from "./useSystemCalls.ts";
 import { Grid } from "./components/Grid.tsx";
+import { ToriiClient } from "@dojoengine/torii-client";
 
 /**
  * Global store for managing Dojo game state.
@@ -20,7 +21,13 @@ export const useDojoStore = createDojoStore<Schema>();
  *
  * @param props.sdk - The Dojo SDK instance configured with the game schema
  */
-function App({ sdk }: { sdk: SDK<Schema> }) {
+function App({
+  sdk,
+  toriiClient,
+}: {
+  sdk: SDK<Schema>;
+  toriiClient: ToriiClient;
+}) {
   const {
     account,
     setup: { client },
@@ -36,29 +43,44 @@ function App({ sdk }: { sdk: SDK<Schema> }) {
   );
 
   useEffect(() => {
+    const fetchTreasurePosition = async () => {
+      const subscription = await toriiClient.onEventMessageUpdated(
+        // const subscription = await toriiClient.onEntityUpdated(
+        [
+          {
+            Keys: {
+              keys: [account.account.address],
+              // models: [], // i want everything that has only one key = account address
+              models: ["dojo_starter-TreasureFound", "dojo_starter-Moved"],
+              pattern_matching: "FixedLen",
+            },
+          },
+        ],
+        false,
+        (resp: any) => {
+          console.log("-- SUBSCRIBED WITH TORII CLIENT");
+          console.log(resp);
+
+          if (resp !== "0x0") {
+            alert("YOU WIN");
+          }
+        }
+      );
+
+      return () => {
+        if (subscription) {
+          subscription.cancel();
+        }
+      };
+    };
+
+    fetchTreasurePosition();
+  }, [toriiClient, account?.account.address]);
+
+  useEffect(() => {
     let unsubscribe: (() => void) | undefined;
 
     const subscribe = async () => {
-      // const winSubscription = await sdk.subscribeEventQuery({
-      //   query: new QueryBuilder<Schema>()
-      //     .namespace("dojo_starter", (n) =>
-      //       n.entity("TreasureFound", (e) => {
-      //         console.log("-- in event TreasureFound");
-      //         console.log(e);
-      //         e.is("player", addAddressPadding(account.account.address));
-      //       })
-      //     )
-      //     .build(),
-      //   callback: (response) => {
-      //     if (response.error) {
-      //       console.error("Error setting up entity sync:", response.error);
-      //     } else if (response.data && response.data[0].entityId !== "0x0") {
-      //       console.log("subscribed", response.data[0]);
-      //       state.updateEntity(response.data[0]);
-      //     }
-      //   },
-      // });
-
       const subscription = await sdk.subscribeEntityQuery({
         query: new QueryBuilder<Schema>()
           .namespace("dojo_starter", (n) =>
@@ -133,8 +155,6 @@ function App({ sdk }: { sdk: SDK<Schema> }) {
   const moves = useModel(entityId, Models.Moves);
   const position = useModel(entityId, Models.Position);
   const treasurePosition = useModel(entityId, Models.TreasurePosition);
-
-  console.log(treasurePosition);
 
   return (
     <div className="bg-black min-h-screen w-full p-4 sm:p-8">
