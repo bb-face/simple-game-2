@@ -30,7 +30,6 @@ pub mod actions {
     pub struct TreasureFound {
         #[key]
         pub player: ContractAddress,
-        //  pub treasure_position: TreasurePosition,
         pub treasure_position: Vec2,
         pub timestamp: u64,
     }

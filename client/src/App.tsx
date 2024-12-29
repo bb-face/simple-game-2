@@ -3,7 +3,7 @@ import { QueryBuilder, SDK, createDojoStore } from "@dojoengine/sdk";
 import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { addAddressPadding } from "starknet";
 
-import { Models, Schema } from "./bindings.ts";
+import { Models, Schema, TreasureFound } from "./bindings.ts";
 import { useDojo } from "./useDojo.tsx";
 import useModel from "./useModel.tsx";
 import { useSystemCalls } from "./useSystemCalls.ts";
@@ -50,19 +50,26 @@ function App({
           {
             Keys: {
               keys: [account.account.address],
+              // keys: [undefined],
               // models: [], // i want everything that has only one key = account address
-              models: ["dojo_starter-TreasureFound", "dojo_starter-Moved"],
+              // models: ["dojo_starter-TreasureFound", "dojo_starter-Moved"],
+              models: ["dojo_starter-TreasureFound"],
+              // models: [],
               pattern_matching: "FixedLen",
             },
           },
         ],
         false,
-        (resp: any) => {
-          console.log("-- SUBSCRIBED WITH TORII CLIENT");
-          console.log(resp);
-
+        (resp: any, model: { "dojo_starter-TreasureFound": TreasureFound }) => {
           if (resp !== "0x0") {
-            alert("YOU WIN");
+            console.log("-- resp");
+            console.log(resp);
+            console.log("-- model");
+            console.log(model);
+            console.log("-- -- model properties");
+            const { player, timestamp, treasure_position } =
+              model["dojo_starter-TreasureFound"];
+            console.log(timestamp.toString());
           }
         }
       );

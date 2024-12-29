@@ -26,12 +26,12 @@ interface DirectionsAvailable {
   directions: Direction[];
 }
 
-// interface TreasureFound {
-//   fieldOrder: string[];
-//   player: string;
-//   vec: Vec2;
-//   example: number;
-// }
+interface TreasureFound {
+  fieldOrder: string[];
+  player: string;
+  timestamp: number;
+  treasure_position: Vec2;
+}
 
 interface TreasurePosition {
   fieldOrder: string[];
@@ -81,7 +81,7 @@ type Schema = {
     Moves: Moves;
     DirectionsAvailable: DirectionsAvailable;
     Position: Position;
-    // TreasureFound: TreasureFound;
+    TreasureFound: TreasureFound;
     TreasurePosition: TreasurePosition;
   };
 };
@@ -93,7 +93,7 @@ enum Models {
   Moves = "dojo_starter-Moves",
   DirectionsAvailable = "dojo_starter-DirectionsAvailable",
   Position = "dojo_starter-Position",
-  // TreasureFound = "dojo_starter-TreasureFound",
+  TreasureFound = "dojo_starter-TreasureFound",
   TreasurePosition = "dojo_starter-TreasurePosition",
 }
 
@@ -116,7 +116,12 @@ const schema: Schema = {
       player: "",
       vec: { x: 0, y: 0 },
     },
-    // TreasureFound: {
+    TreasureFound: {
+      fieldOrder: ["player", "timestamp", "treasure_position"],
+      player: "",
+      timestamp: 0,
+      treasure_position: { x: 0, y: 0 },
+    },
     TreasurePosition: {
       fieldOrder: ["player", "vec", "example"],
       player: "",
@@ -131,7 +136,7 @@ export type {
   Moves,
   DirectionsAvailable,
   Position,
-  // TreasureFound,
+  TreasureFound,
   TreasurePosition,
   Vec2,
 };
