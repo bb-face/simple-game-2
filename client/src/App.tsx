@@ -1,14 +1,22 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { QueryBuilder, SDK, createDojoStore } from "@dojoengine/sdk";
 import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { addAddressPadding } from "starknet";
 
-import { Models, Schema, TreasureFound } from "./bindings.ts";
+import { Models, Schema, TreasureFound, PlayerSpawned } from "./bindings.ts";
 import { useDojo } from "./useDojo.tsx";
 import useModel from "./useModel.tsx";
 import { useSystemCalls } from "./useSystemCalls.ts";
 import { Grid } from "./components/Grid.tsx";
 import { ToriiClient } from "@dojoengine/torii-client";
+import { convertHexToDate } from "./aux.ts";
+
+interface EntityProperty {
+  key: boolean;
+  type: string;
+  type_name: string;
+  value: string;
+}
 
 /**
  * Global store for managing Dojo game state.
@@ -34,6 +42,8 @@ function App({
   } = useDojo();
   const state = useDojoStore((state) => state);
   const entities = useDojoStore((state) => state.entities);
+  const [timestampStart, setTimestampStart] = useState<Date | null>(null);
+  const [timestampEnd, setTimestampEnd] = useState<Date | null>(null);
 
   const { spawn } = useSystemCalls();
 
@@ -53,23 +63,48 @@ function App({
               // keys: [undefined],
               // models: [], // i want everything that has only one key = account address
               // models: ["dojo_starter-TreasureFound", "dojo_starter-Moved"],
-              models: ["dojo_starter-TreasureFound"],
+              models: [
+                "dojo_starter-PlayerSpawned",
+                "dojo_starter-TreasureFound",
+              ],
               // models: [],
               pattern_matching: "FixedLen",
             },
           },
         ],
         false,
-        (resp: any, model: { "dojo_starter-TreasureFound": TreasureFound }) => {
+        (
+          resp: any,
+          model: {
+            "dojo_starter-TreasureFound": TreasureFound;
+            "dojo_starter-PlayerSpawned": PlayerSpawned;
+          }
+        ) => {
           if (resp !== "0x0") {
-            console.log("-- resp");
-            console.log(resp);
-            console.log("-- model");
-            console.log(model);
-            console.log("-- -- model properties");
-            const { player, timestamp, treasure_position } =
-              model["dojo_starter-TreasureFound"];
-            console.log(timestamp.toString());
+            const playerSpawned = model["dojo_starter-PlayerSpawned"];
+            const playerFoundTreasure = model["dojo_starter-TreasureFound"];
+
+            if (playerSpawned) {
+              const { player, timestamp } = model["dojo_starter-PlayerSpawned"];
+
+              // @ts-ignore
+              const timestampValue = convertHexToDate(timestamp.value);
+
+              console.log(timestampValue);
+              // @ts-ignore
+              setTimestampStart(timestampValue);
+            }
+
+            if (playerFoundTreasure) {
+              const { player, timestamp, treasure_position } =
+                model["dojo_starter-TreasureFound"];
+
+              // @ts-ignore
+              const timestampValue = convertHexToDate(timestamp.value);
+
+              console.log(timestampValue);
+              setTimestampEnd(timestampValue);
+            }
           }
         }
       );
@@ -158,6 +193,17 @@ function App({
 
     fetchEntities();
   }, [sdk, account?.account.address]);
+
+  useEffect(() => {
+    if (timestampStart && timestampEnd) {
+      alert(
+        `You won in: ${(
+          (timestampEnd.getTime() - timestampStart.getTime()) /
+          1000
+        ).toFixed(2)}s`
+      );
+    }
+  }, [timestampStart, timestampEnd]);
 
   const moves = useModel(entityId, Models.Moves);
   const position = useModel(entityId, Models.Position);

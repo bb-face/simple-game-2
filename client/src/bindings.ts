@@ -26,6 +26,12 @@ interface DirectionsAvailable {
   directions: Direction[];
 }
 
+interface PlayerSpawned {
+  fieldOrder: string[];
+  player: string;
+  timestamp: number;
+}
+
 interface TreasureFound {
   fieldOrder: string[];
   player: string;
@@ -82,6 +88,7 @@ type Schema = {
     DirectionsAvailable: DirectionsAvailable;
     Position: Position;
     TreasureFound: TreasureFound;
+    PlayerSpawned: PlayerSpawned;
     TreasurePosition: TreasurePosition;
   };
 };
@@ -95,6 +102,7 @@ enum Models {
   Position = "dojo_starter-Position",
   TreasureFound = "dojo_starter-TreasureFound",
   TreasurePosition = "dojo_starter-TreasurePosition",
+  PlayerSpawned = "dojo_starter-PlayerSpawned",
 }
 
 const schema: Schema = {
@@ -128,6 +136,11 @@ const schema: Schema = {
       vec: { x: 0, y: 0 },
       example: 1,
     },
+    PlayerSpawned: {
+      fieldOrder: ["player", "timestamp"],
+      player: "",
+      timestamp: 0,
+    },
   },
 };
 
@@ -136,6 +149,7 @@ export type {
   Moves,
   DirectionsAvailable,
   Position,
+  PlayerSpawned,
   TreasureFound,
   TreasurePosition,
   Vec2,

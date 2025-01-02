@@ -19,6 +19,14 @@ pub mod actions {
 
     #[derive(Copy, Drop, Serde)]
     #[dojo::event]
+    pub struct PlayerSpawned {
+        #[key]
+        pub player: ContractAddress,
+        pub timestamp: u64,
+    }
+
+    #[derive(Copy, Drop, Serde)]
+    #[dojo::event]
     pub struct Moved {
         #[key]
         pub player: ContractAddress,
@@ -67,7 +75,7 @@ pub mod actions {
 
             // Write the new moves to the world.
             world.write_model(@moves);
-            // });
+            world.emit_event(@PlayerSpawned { player, timestamp: starknet::get_block_timestamp() });
         }
 
         // Implementation of the move function for the ContractState struct.
