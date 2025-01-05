@@ -14,6 +14,15 @@ interface Moves {
   can_move: boolean;
 }
 
+interface Grid {
+  fieldOrder: string[];
+  player: string;
+  width: number;
+  height: number;
+  treasure_position: TreasurePosition;
+  player_initial_position: Position;
+}
+
 /**
  * Interface representing available movement directions for a player.
  */
@@ -43,7 +52,6 @@ interface TreasurePosition {
   fieldOrder: string[];
   player: string;
   vec: Vec2;
-  example: number;
 }
 
 /**
@@ -90,6 +98,7 @@ type Schema = {
     TreasureFound: TreasureFound;
     PlayerSpawned: PlayerSpawned;
     TreasurePosition: TreasurePosition;
+    Grid: Grid;
   };
 };
 
@@ -103,6 +112,7 @@ enum Models {
   TreasureFound = "dojo_starter-TreasureFound",
   TreasurePosition = "dojo_starter-TreasurePosition",
   PlayerSpawned = "dojo_starter-PlayerSpawned",
+  Grid = "dojo_starter-Grid",
 }
 
 const schema: Schema = {
@@ -131,15 +141,36 @@ const schema: Schema = {
       treasure_position: { x: 0, y: 0 },
     },
     TreasurePosition: {
-      fieldOrder: ["player", "vec", "example"],
+      fieldOrder: ["player", "vec"],
       player: "",
       vec: { x: 0, y: 0 },
-      example: 1,
     },
     PlayerSpawned: {
       fieldOrder: ["player", "timestamp"],
       player: "",
       timestamp: 0,
+    },
+    Grid: {
+      fieldOrder: [
+        "player",
+        "width",
+        "height",
+        "treasure_position",
+        "player_initial_position",
+      ],
+      player: "",
+      width: 0,
+      height: 0,
+      treasure_position: {
+        fieldOrder: ["player", "vec"],
+        player: "",
+        vec: { x: 0, y: 0 },
+      },
+      player_initial_position: {
+        fieldOrder: ["player", "vec"],
+        player: "",
+        vec: { x: 0, y: 0 },
+      },
     },
   },
 };
@@ -153,5 +184,6 @@ export type {
   TreasureFound,
   TreasurePosition,
   Vec2,
+  Grid,
 };
 export { Direction, schema, Models };

@@ -134,8 +134,9 @@ function App({
                 e.is("player", addAddressPadding(account.account.address))
               )
               .entity("TreasurePosition", (e) => {
-                console.log("-- in entity TreasureFound");
-                console.log(e);
+                e.is("player", addAddressPadding(account.account.address));
+              })
+              .entity("Grid", (e) => {
                 e.is("player", addAddressPadding(account.account.address));
               })
           )
@@ -208,6 +209,10 @@ function App({
   const moves = useModel(entityId, Models.Moves);
   const position = useModel(entityId, Models.Position);
   const treasurePosition = useModel(entityId, Models.TreasurePosition);
+  const grid = useModel(entityId, Models.Grid);
+
+  console.log("-- grid");
+  console.log(grid);
 
   return (
     <div className="bg-black min-h-screen w-full p-4 sm:p-8">

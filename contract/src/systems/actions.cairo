@@ -1,4 +1,4 @@
-use dojo_starter::models::{Direction, Position};
+use dojo_starter::models::{Direction, Position, Grid};
 
 // define the interface
 #[starknet::interface]
@@ -12,7 +12,7 @@ trait IActions<T> {
 pub mod actions {
     use super::{IActions, Direction, Position, next_position};
     use starknet::{ContractAddress, get_caller_address};
-    use dojo_starter::models::{Vec2, Moves, DirectionsAvailable, TreasurePosition};
+    use dojo_starter::models::{Vec2, Moves, DirectionsAvailable, TreasurePosition, Grid};
 
     use dojo::model::{ModelStorage, ModelValueStorage};
     use dojo::event::EventStorage;
@@ -55,18 +55,27 @@ pub mod actions {
 
             // Update the world state with the new data.
 
+            let new_position_vector = Vec2 { x: position.vec.x + 10, y: position.vec.y + 10 };
             // 1. Move the player's position 10 units in both the x and y direction.
-            let new_position = Position {
-                player, vec: Vec2 { x: position.vec.x + 10, y: position.vec.y + 10 }
-            };
+            let new_position = Position { player, vec: new_position_vector };
 
-            let new_treasure_position = TreasurePosition {
-                player, vec: Vec2 { x: 11, y: 11 }, example: 8
+            let new_treasure_position = TreasurePosition { player, vec: Vec2 { x: 11, y: 11 } };
+
+            let grid_width: u32 = 15;
+            let grid_height: u32 = 15;
+
+            let grid = Grid {
+                player,
+                width: grid_width,
+                height: grid_height,
+                treasure_position: new_treasure_position,
+                player_initial_position: new_position_vector,
             };
 
             // Write the new position to the world.
             world.write_model(@new_position);
             world.write_model(@new_treasure_position);
+            world.write_model(@grid);
 
             // 2. Set the player's remaining moves to 100.
             let moves = Moves {
@@ -75,6 +84,7 @@ pub mod actions {
 
             // Write the new moves to the world.
             world.write_model(@moves);
+
             world.emit_event(@PlayerSpawned { player, timestamp: starknet::get_block_timestamp() });
         }
 

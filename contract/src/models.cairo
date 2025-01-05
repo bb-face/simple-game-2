@@ -32,7 +32,17 @@ pub struct TreasurePosition {
     #[key]
     pub player: ContractAddress,
     pub vec: Vec2,
-    pub example: u8,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct Grid {
+    #[key]
+    pub player: ContractAddress,
+    pub width: u32,
+    pub height: u32,
+    pub treasure_position: TreasurePosition,
+    pub player_initial_position: Vec2,
 }
 
 #[derive(Serde, Copy, Drop, Introspect, PartialEq, Debug)]
