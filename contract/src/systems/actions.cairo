@@ -11,7 +11,7 @@ trait IActions<T> {
 #[dojo::contract]
 pub mod actions {
     use super::{IActions, Direction, Position, next_position};
-    use starknet::{ContractAddress, get_caller_address};
+    use starknet::{ContractAddress, get_caller_address, get_block_number};
     use dojo_starter::models::{Vec2, Moves, DirectionsAvailable, TreasurePosition, Grid};
 
     use dojo::model::{ModelStorage, ModelValueStorage};
@@ -42,6 +42,15 @@ pub mod actions {
         pub timestamp: u64,
     }
 
+    #[derive(Copy, Drop, Serde)]
+    #[dojo::event]
+    pub struct Warning__FastWin {
+        #[key]
+        pub player: ContractAddress,
+        pub timestamp: u64,
+        pub block_number: u64,
+    }
+
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
         fn spawn(ref self: ContractState) {
@@ -70,6 +79,7 @@ pub mod actions {
                 height: grid_height,
                 treasure_position: new_treasure_position_vector,
                 player_initial_position: new_position_vector,
+                starting_block: starknet::get_block_number(),
             };
 
             // Write the new position to the world.
@@ -119,7 +129,22 @@ pub mod actions {
             // Emit an event to the world to notify about the player's move.
             world.emit_event(@Moved { player, direction });
 
+            let grid: Grid = world.read_model(player);
+
             if (next.vec.x == treasure_position.vec.x && next.vec.y == treasure_position.vec.y) {
+                let current_block = starknet::get_block_number();
+
+                if (current_block - grid.starting_block < 10_u64) {
+                    world
+                        .emit_event(
+                            @Warning__FastWin {
+                                player,
+                                timestamp: starknet::get_block_timestamp(),
+                                block_number: current_block,
+                            }
+                        );
+                }
+
                 world
                     .emit_event(
                         @TreasureFound {

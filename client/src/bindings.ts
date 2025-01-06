@@ -21,6 +21,7 @@ interface Grid {
   height: number;
   treasure_position: Vec2;
   player_initial_position: Vec2;
+  starting_block: number;
 }
 
 /**
@@ -33,6 +34,13 @@ interface DirectionsAvailable {
   player: string;
   /** List of available directions */
   directions: Direction[];
+}
+
+interface Warning__FastWin {
+  fieldOrder: string[];
+  player: string;
+  timestamp: number;
+  block_number: number;
 }
 
 interface PlayerSpawned {
@@ -97,6 +105,7 @@ type Schema = {
     Position: Position;
     TreasureFound: TreasureFound;
     PlayerSpawned: PlayerSpawned;
+    Warning__FastWin: Warning__FastWin;
     TreasurePosition: TreasurePosition;
     Grid: Grid;
   };
@@ -150,6 +159,12 @@ const schema: Schema = {
       player: "",
       timestamp: 0,
     },
+    Warning__FastWin: {
+      fieldOrder: ["player", "timestamp", "block_number"],
+      player: "",
+      timestamp: 0,
+      block_number: 0,
+    },
     Grid: {
       fieldOrder: [
         "player",
@@ -157,12 +172,14 @@ const schema: Schema = {
         "height",
         "treasure_position",
         "player_initial_position",
+        "starting_block",
       ],
       player: "",
       width: 0,
       height: 0,
       treasure_position: { x: 0, y: 0 },
       player_initial_position: { x: 0, y: 0 },
+      starting_block: 0,
     },
   },
 };
@@ -173,6 +190,7 @@ export type {
   DirectionsAvailable,
   Position,
   PlayerSpawned,
+  Warning__FastWin,
   TreasureFound,
   TreasurePosition,
   Vec2,

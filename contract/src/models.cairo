@@ -43,6 +43,7 @@ pub struct Grid {
     pub height: u32,
     pub treasure_position: Vec2,
     pub player_initial_position: Vec2,
+    pub starting_block: u64,
 }
 
 #[derive(Serde, Copy, Drop, Introspect, PartialEq, Debug)]

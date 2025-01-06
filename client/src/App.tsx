@@ -3,7 +3,13 @@ import { QueryBuilder, SDK, createDojoStore } from "@dojoengine/sdk";
 import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { addAddressPadding } from "starknet";
 
-import { Models, Schema, TreasureFound, PlayerSpawned } from "./bindings.ts";
+import {
+  Models,
+  Schema,
+  TreasureFound,
+  PlayerSpawned,
+  Warning__FastWin,
+} from "./bindings.ts";
 import { useDojo } from "./useDojo.tsx";
 import useModel from "./useModel.tsx";
 import { useSystemCalls } from "./useSystemCalls.ts";
@@ -66,6 +72,7 @@ function App({
               models: [
                 "dojo_starter-PlayerSpawned",
                 "dojo_starter-TreasureFound",
+                "dojo_starter-Warning__FastWin",
               ],
               // models: [],
               pattern_matching: "FixedLen",
@@ -78,11 +85,17 @@ function App({
           model: {
             "dojo_starter-TreasureFound": TreasureFound;
             "dojo_starter-PlayerSpawned": PlayerSpawned;
+            "dojo_starter-Warning__FastWin": Warning__FastWin;
           }
         ) => {
           if (resp !== "0x0") {
             const playerSpawned = model["dojo_starter-PlayerSpawned"];
             const playerFoundTreasure = model["dojo_starter-TreasureFound"];
+            const playerFastWin = model["dojo_starter-Warning__FastWin"];
+
+            if (playerFastWin) {
+              console.log("playerFastWin", playerFastWin);
+            }
 
             if (playerSpawned) {
               const { player, timestamp } = model["dojo_starter-PlayerSpawned"];
