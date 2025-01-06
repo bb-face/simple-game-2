@@ -19,8 +19,8 @@ interface Grid {
   player: string;
   width: number;
   height: number;
-  treasure_position: TreasurePosition;
-  player_initial_position: Position;
+  treasure_position: Vec2;
+  player_initial_position: Vec2;
 }
 
 /**
@@ -161,16 +161,8 @@ const schema: Schema = {
       player: "",
       width: 0,
       height: 0,
-      treasure_position: {
-        fieldOrder: ["player", "vec"],
-        player: "",
-        vec: { x: 0, y: 0 },
-      },
-      player_initial_position: {
-        fieldOrder: ["player", "vec"],
-        player: "",
-        vec: { x: 0, y: 0 },
-      },
+      treasure_position: { x: 0, y: 0 },
+      player_initial_position: { x: 0, y: 0 },
     },
   },
 };

@@ -53,13 +53,13 @@ pub mod actions {
             // Retrieve the player's current position from the world.
             let position: Position = world.read_model(player);
 
-            // Update the world state with the new data.
-
             let new_position_vector = Vec2 { x: position.vec.x + 10, y: position.vec.y + 10 };
-            // 1. Move the player's position 10 units in both the x and y direction.
-            let new_position = Position { player, vec: new_position_vector };
+            let new_treasure_position_vector = Vec2 { x: 11, y: 11 };
 
-            let new_treasure_position = TreasurePosition { player, vec: Vec2 { x: 11, y: 11 } };
+            let new_position = Position { player, vec: new_position_vector };
+            let new_treasure_position = TreasurePosition {
+                player, vec: new_treasure_position_vector
+            };
 
             let grid_width: u32 = 15;
             let grid_height: u32 = 15;
@@ -68,7 +68,7 @@ pub mod actions {
                 player,
                 width: grid_width,
                 height: grid_height,
-                treasure_position: new_treasure_position,
+                treasure_position: new_treasure_position_vector,
                 player_initial_position: new_position_vector,
             };
 

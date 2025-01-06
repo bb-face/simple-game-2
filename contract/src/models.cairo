@@ -41,7 +41,7 @@ pub struct Grid {
     pub player: ContractAddress,
     pub width: u32,
     pub height: u32,
-    pub treasure_position: TreasurePosition,
+    pub treasure_position: Vec2,
     pub player_initial_position: Vec2,
 }
 

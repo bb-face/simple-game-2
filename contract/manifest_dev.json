@@ -1252,8 +1252,8 @@
   },
   "contracts": [
     {
-      "address": "0x2fc64d42ae890e823d0b36fdfd98a32690ddee5f6484adfa71fe1ca55b6d18c",
-      "class_hash": "0x75f1fb649e567db05a6ff7de6e6e062ebd6f87643e5aed26e45c3653e3e516d",
+      "address": "0xe1a266101af6f107a8bcca34f7c867b07e9870f21f23d85d31ce19bfc0f4c6",
+      "class_hash": "0x5b527f8826b8b902e37f96be455657db00d4b9641524ae303c1384f21225567",
       "abi": [
         {
           "type": "impl",
@@ -1495,7 +1495,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x46ebf3b489935d69f818561c290810c31b14a1f90122e348a66540d0e95bb5d",
+      "class_hash": "0x3bc52ece16899cdaa78a6611c041bc611532c5d9f7df9ee9e5317d9abdd9a1f",
       "tag": "dojo_starter-Grid",
       "selector": "0x77330ae49bcac447c5e04cbda1fcbb78a941c78f135c560ad5f3979750c81fd"
     },
