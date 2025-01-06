@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { QueryBuilder, SDK, createDojoStore } from "@dojoengine/sdk";
 import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { addAddressPadding } from "starknet";
+import { ReplayGrid } from "./components/ReplayGrid.tsx";
 
 import {
   Models,
@@ -50,6 +51,7 @@ function App({
   const entities = useDojoStore((state) => state.entities);
   const [timestampStart, setTimestampStart] = useState<Date | null>(null);
   const [timestampEnd, setTimestampEnd] = useState<Date | null>(null);
+  const [replayEvents, setReplayEvents] = useState([]);
 
   const { spawn } = useSystemCalls();
 
@@ -57,6 +59,22 @@ function App({
     () => getEntityIdFromKeys([BigInt(account?.account.address)]),
     [account?.account.address]
   );
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const json = JSON.parse(e.target?.result as string);
+          setReplayEvents(json);
+        } catch (error) {
+          console.error("Error parsing JSON:", error);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
 
   useEffect(() => {
     const fetchTreasurePosition = async () => {
@@ -340,6 +358,16 @@ function App({
               ))}
             </div>
           </div>
+        </div>
+
+        <div className="bg-gray-700 p-4 rounded-lg shadow-inner flex flex-col items-center gap-4">
+          <input
+            type="file"
+            accept=".json"
+            onChange={handleFileUpload}
+            className="mb-4 text-white"
+          />
+          {replayEvents.length > 0 && <ReplayGrid events={replayEvents} />}
         </div>
 
         <div className="mt-8 overflow-x-auto">
