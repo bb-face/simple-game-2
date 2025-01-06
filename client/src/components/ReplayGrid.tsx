@@ -24,6 +24,17 @@ export const ReplayGrid = ({ events }: ReplayGridProps) => {
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const gridSize = 20;
 
+  const getTimeDifference = (): string => {
+    if (currentEventIndex === 0 || !events[currentEventIndex]) return "Start";
+
+    const currentTime = new Date(events[currentEventIndex].executed_at);
+    const previousTime = new Date(events[currentEventIndex - 1].executed_at);
+    const diffInSeconds =
+      (currentTime.getTime() - previousTime.getTime()) / 1000;
+
+    return `+${diffInSeconds.toFixed(1)}s`;
+  };
+
   const getCurrentPositions = (): {
     playerPos: Position | null;
     treasurePos: Position | null;
@@ -90,7 +101,8 @@ export const ReplayGrid = ({ events }: ReplayGridProps) => {
           Previous
         </button>
         <span className="text-white">
-          Event {currentEventIndex + 1} of {events.length}
+          Event {currentEventIndex + 1} of {events.length}{" "}
+          <span className="text-gray-400">({getTimeDifference()})</span>
         </span>
         <button
           className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-gray-400"
