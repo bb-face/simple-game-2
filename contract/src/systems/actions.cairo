@@ -23,6 +23,7 @@ pub mod actions {
         #[key]
         pub player: ContractAddress,
         pub timestamp: u64,
+        pub grid: Grid,
     }
 
     #[derive(Copy, Drop, Serde)]
@@ -95,7 +96,12 @@ pub mod actions {
             // Write the new moves to the world.
             world.write_model(@moves);
 
-            world.emit_event(@PlayerSpawned { player, timestamp: starknet::get_block_timestamp() });
+            world
+                .emit_event(
+                    @PlayerSpawned {
+                        player, timestamp: starknet::get_block_timestamp(), grid: grid
+                    }
+                );
         }
 
         // Implementation of the move function for the ContractState struct.

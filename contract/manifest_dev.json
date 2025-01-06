@@ -1252,8 +1252,8 @@
   },
   "contracts": [
     {
-      "address": "0x100a93d651ce971a4f69c4c7f8e1e4b169f670803ece1c0de888520f3976a47",
-      "class_hash": "0x3b2e464b8a7027e5ba6fd0232025232ed1ffe3ba0e9ada4456a851d5a79e38c",
+      "address": "0x354649bbdeb0cf9d19aa57187f527b94afc9277d4f485ce444013ed6d753c09",
+      "class_hash": "0x36adfb9f39f9b6ae2b1df163bd16ec17d3309a044cfdafe59dc02bb96b36577",
       "abi": [
         {
           "type": "impl",
@@ -1527,7 +1527,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x557bcd24fa9c2630de162b15b4e4dec4a3720c962952315e81389b332da9e3a",
+      "class_hash": "0x54935fd367a1353fde04bd1bb3d9efc5733d849ba7f24ce718df67fb6c6fc0f",
       "tag": "dojo_starter-PlayerSpawned",
       "selector": "0x5ae774f30c57741d65d258b45cd664de99fec5e031870df61757751a1cece4f"
     },
