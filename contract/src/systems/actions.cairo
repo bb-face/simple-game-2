@@ -121,6 +121,20 @@ pub mod actions {
         wall_positions
     }
 
+    fn is_wall(walls: Array<Vec2>, position: Vec2) -> bool {
+        let mut i = 0;
+        loop {
+            if i >= walls.len() {
+                break false;
+            }
+            let wall_pos = *walls.at(i);
+            if wall_pos.x == position.x && wall_pos.y == position.y {
+                break true;
+            }
+            i += 1;
+        }
+    }
+
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
         fn spawn(ref self: ContractState) {
@@ -178,59 +192,62 @@ pub mod actions {
 
         // Implementation of the move function for the ContractState struct.
         fn move(ref self: ContractState, direction: Direction) {
-            // Get the address of the current caller, possibly the player's address.
-
             let mut world = self.world_default();
-
             let player = get_caller_address();
 
-            // Retrieve the player's current position and moves data from the world.
+            // Read models
             let position: Position = world.read_model(player);
             let treasure_position: TreasurePosition = world.read_model(player);
             let mut moves: Moves = world.read_model(player);
-
-            // Deduct one from the player's remaining moves.
-            moves.remaining -= 1;
-
-            // Update the last direction the player moved in.
-            moves.last_direction = direction;
-
-            // Calculate the player's next position based on the provided direction.
-            let next = next_position(position, direction);
-
-            // Write the new position to the world.
-            world.write_model(@next);
-
-            // Write the new moves to the world.
-            world.write_model(@moves);
-
-            // Emit an event to the world to notify about the player's move.
-            world.emit_event(@Moved { player, direction });
-
             let grid: Grid = world.read_model(player);
 
-            if (next.vec.x == treasure_position.vec.x && next.vec.y == treasure_position.vec.y) {
-                let current_block = starknet::get_block_number();
+            // Calculate the next position
+            let next = next_position(position, direction);
 
-                if (current_block - grid.starting_block < 10_u64) {
+            // Check if the next position contains a wall
+            if !is_wall(grid.walls, next.vec) {
+                // Only update position if there's no wall
+                world.write_model(@next);
+
+                // Update moves
+                moves.remaining -= 1;
+                moves.last_direction = direction;
+                world.write_model(@moves);
+
+                // Emit move event
+                world.emit_event(@Moved { player, direction });
+
+                // Check treasure collection
+                if (next.vec.x == treasure_position.vec.x
+                    && next.vec.y == treasure_position.vec.y) {
+                    let current_block = starknet::get_block_number();
+
+                    if (current_block - grid.starting_block < 10_u64) {
+                        world
+                            .emit_event(
+                                @Warning__FastWin {
+                                    player,
+                                    timestamp: starknet::get_block_timestamp(),
+                                    block_number: current_block,
+                                }
+                            );
+                    }
+
                     world
                         .emit_event(
-                            @Warning__FastWin {
+                            @TreasureFound {
                                 player,
-                                timestamp: starknet::get_block_timestamp(),
-                                block_number: current_block,
+                                treasure_position: treasure_position.vec,
+                                timestamp: starknet::get_block_timestamp()
                             }
                         );
                 }
+            } else {
+                // still count the move
+                moves.remaining -= 1;
+                moves.last_direction = direction;
 
-                world
-                    .emit_event(
-                        @TreasureFound {
-                            player,
-                            treasure_position: treasure_position.vec,
-                            timestamp: starknet::get_block_timestamp()
-                        }
-                    );
+                world.write_model(@moves);
             }
         }
     }
