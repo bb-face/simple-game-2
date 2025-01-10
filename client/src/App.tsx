@@ -286,7 +286,11 @@ function App({
         </div>
 
         <div className="bg-gray-700 p-4 rounded-lg shadow-inner flex justify-center items-center">
-          <Grid position={position} treasure={treasurePosition} />
+          <Grid
+            position={position}
+            treasure={treasurePosition}
+            walls={grid?.walls}
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">

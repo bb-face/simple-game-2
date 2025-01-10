@@ -17,7 +17,7 @@ pub mod actions {
     use dojo::model::{ModelStorage, ModelValueStorage};
     use dojo::event::EventStorage;
 
-    #[derive(Copy, Drop, Serde)]
+    #[derive(Drop, Serde)]
     #[dojo::event]
     pub struct PlayerSpawned {
         #[key]
@@ -52,6 +52,75 @@ pub mod actions {
         pub block_number: u64,
     }
 
+    #[derive(Copy, Drop, Serde)]
+    struct Wall {
+        start: Vec2,
+        length: u32,
+        is_horizontal: bool,
+    }
+
+    fn generate_walls(
+        grid_width: u32, grid_height: u32, num_walls: u32, total_length: u32
+    ) -> Array<Vec2> {
+        let mut wall_positions = ArrayTrait::new();
+
+        let avg_length = total_length / num_walls;
+
+        let mut remaining_length = total_length;
+        let mut walls_created = 0;
+
+        loop {
+            if walls_created >= num_walls {
+                break;
+            }
+
+            let is_horizontal = walls_created % 2 == 0;
+
+            let mut wall_length = if walls_created == num_walls - 1 {
+                remaining_length
+            } else {
+                avg_length
+            };
+
+            // I would need proper randomness here
+            let start_x = if is_horizontal {
+                grid_width - wall_length
+            } else {
+                grid_width - 1
+            };
+
+            let start_y = if is_horizontal {
+                grid_height - 1
+            } else {
+                grid_height - wall_length
+            };
+
+            let mut current_pos = Vec2 { x: start_x, y: start_y };
+            let mut length_added = 0;
+
+            loop {
+                if length_added >= wall_length {
+                    break;
+                }
+
+                wall_positions.append(current_pos);
+
+                if is_horizontal {
+                    current_pos.x += 1;
+                } else {
+                    current_pos.y += 1;
+                }
+
+                length_added += 1;
+            };
+
+            remaining_length -= wall_length;
+            walls_created += 1;
+        };
+
+        wall_positions
+    }
+
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
         fn spawn(ref self: ContractState) {
@@ -74,6 +143,8 @@ pub mod actions {
             let grid_width: u32 = 15;
             let grid_height: u32 = 15;
 
+            let walls = generate_walls(grid_width, grid_height, 10, 30);
+
             let grid = Grid {
                 player,
                 width: grid_width,
@@ -81,6 +152,7 @@ pub mod actions {
                 treasure_position: new_treasure_position_vector,
                 player_initial_position: new_position_vector,
                 starting_block: starknet::get_block_number(),
+                walls,
             };
 
             // Write the new position to the world.

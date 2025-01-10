@@ -22,6 +22,7 @@ interface Grid {
   treasure_position: Vec2;
   player_initial_position: Vec2;
   starting_block: number;
+  walls: Array<Vec2>;
 }
 
 /**
@@ -173,6 +174,7 @@ const schema: Schema = {
         "treasure_position",
         "player_initial_position",
         "starting_block",
+        "walls",
       ],
       player: "",
       width: 0,
@@ -180,6 +182,7 @@ const schema: Schema = {
       treasure_position: { x: 0, y: 0 },
       player_initial_position: { x: 0, y: 0 },
       starting_block: 0,
+      walls: [],
     },
   },
 };

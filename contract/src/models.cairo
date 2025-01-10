@@ -26,6 +26,12 @@ pub struct Position {
     pub vec: Vec2,
 }
 
+pub struct Wall {
+    #[key]
+    pub player: ContractAddress,
+    pub position: Array<Vec2>,
+}
+
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
 pub struct TreasurePosition {
@@ -34,7 +40,7 @@ pub struct TreasurePosition {
     pub vec: Vec2,
 }
 
-#[derive(Copy, Drop, Serde, Debug)]
+#[derive(Drop, Serde, Debug)]
 #[dojo::model]
 pub struct Grid {
     #[key]
@@ -44,6 +50,7 @@ pub struct Grid {
     pub treasure_position: Vec2,
     pub player_initial_position: Vec2,
     pub starting_block: u64,
+    pub walls: Array<Vec2>,
 }
 
 #[derive(Serde, Copy, Drop, Introspect, PartialEq, Debug)]
