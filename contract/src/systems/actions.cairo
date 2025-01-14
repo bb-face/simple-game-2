@@ -1,5 +1,6 @@
 use dojo_starter::models::{Direction, Position, Grid};
-use super::proof_of_speed;
+use super::proof_of_speed::proof_of_speed::{start_game, move_player, win_game};
+
 
 #[starknet::interface]
 trait IActions<T> {
@@ -16,7 +17,7 @@ pub mod actions {
     use dojo::model::{ModelStorage, ModelValueStorage};
     use dojo::event::EventStorage;
 
-    use super::proof_of_speed::{start_game};
+    use super::{start_game, move_player, win_game};
 
     #[derive(Copy, Drop, Serde)]
     struct Wall {
@@ -142,7 +143,7 @@ pub mod actions {
 
             world.write_model(@moves);
 
-            proof_of_speed::start_game(world, player, grid);
+            start_game(ref world, player, grid);
             // world
         //     .emit_event(
         //         @PlayerSpawned {
@@ -170,6 +171,7 @@ pub mod actions {
                 moves.last_direction = direction;
                 world.write_model(@moves);
 
+                move_player(ref world, player, direction);
                 // world.emit_event(@Moved { player, direction });
 
                 if (next.vec.x == treasure_position.vec.x
@@ -185,6 +187,8 @@ pub mod actions {
                     //         }
                     //     );
                     }
+
+                    win_game(ref world, player);
                     //world
                 //    .emit_event(
                 //        @TreasureFound {

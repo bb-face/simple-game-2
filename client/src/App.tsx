@@ -7,9 +7,10 @@ import { ReplayGrid } from "./components/ReplayGrid.tsx";
 import {
   Models,
   Schema,
-  TreasureFound,
-  PlayerSpawned,
+  WinGame,
+  StartGame,
   Warning__FastWin,
+  Moved,
 } from "./bindings.ts";
 import { useDojo } from "./useDojo.tsx";
 import useModel from "./useModel.tsx";
@@ -88,9 +89,10 @@ function App({
               // models: [], // i want everything that has only one key = account address
               // models: ["dojo_starter-TreasureFound", "dojo_starter-Moved"],
               models: [
-                "dojo_starter-PlayerSpawned",
-                "dojo_starter-TreasureFound",
-                "dojo_starter-Warning__FastWin",
+                "dojo_starter-StartGame",
+                "dojo_starter-WinGame",
+                "dojo_starter-Moved",
+                // "dojo_starter-Warning__FastWin",
               ],
               // models: [],
               pattern_matching: "FixedLen",
@@ -101,22 +103,27 @@ function App({
         (
           resp: any,
           model: {
-            "dojo_starter-TreasureFound": TreasureFound;
-            "dojo_starter-PlayerSpawned": PlayerSpawned;
-            "dojo_starter-Warning__FastWin": Warning__FastWin;
+            // "dojo_starter-WinGame": WinGame;
+            // "dojo_starter-StartGame": StartGame;
+            // "dojo_starter-Moved": Moved;
+            //"dojo_starter-Warning__FastWin": Warning__FastWin;
           }
         ) => {
+          console.log("-- here 11");
+          console.log(resp);
           if (resp !== "0x0") {
-            const playerSpawned = model["dojo_starter-PlayerSpawned"];
-            const playerFoundTreasure = model["dojo_starter-TreasureFound"];
-            const playerFastWin = model["dojo_starter-Warning__FastWin"];
+            console.log("-- here");
 
-            if (playerFastWin) {
-              console.log("playerFastWin", playerFastWin);
-            }
+            const startGame =
+              model["dojo_starter-StartGame" as keyof typeof model];
+            console.log(startGame);
+            const playerFoundTreasure =
+              model["dojo_starter-WinGame" as keyof typeof model];
+            console.log(playerFoundTreasure);
+            // const playerFastWin = model["dojo_starter-Warning__FastWin"];
 
-            if (playerSpawned) {
-              const { player, timestamp } = model["dojo_starter-PlayerSpawned"];
+            if (startGame) {
+              const { player, timestamp } = startGame;
 
               // @ts-ignore
               const timestampValue = convertHexToDate(timestamp.value);
@@ -127,8 +134,7 @@ function App({
             }
 
             if (playerFoundTreasure) {
-              const { player, timestamp, treasure_position } =
-                model["dojo_starter-TreasureFound"];
+              const { player, timestamp, block_number } = playerFoundTreasure;
 
               // @ts-ignore
               const timestampValue = convertHexToDate(timestamp.value);
@@ -176,7 +182,6 @@ function App({
           if (response.error) {
             console.error("Error setting up entity sync:", response.error);
           } else if (response.data && response.data[0].entityId !== "0x0") {
-            console.log("subscribed", response.data[0]);
             state.updateEntity(response.data[0]);
           }
         },
@@ -241,9 +246,6 @@ function App({
   const position = useModel(entityId, Models.Position);
   const treasurePosition = useModel(entityId, Models.TreasurePosition);
   const grid = useModel(entityId, Models.Grid);
-
-  console.log("-- grid");
-  console.log(grid);
 
   return (
     <div className="bg-black min-h-screen w-full p-4 sm:p-8">

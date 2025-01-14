@@ -1252,8 +1252,8 @@
   },
   "contracts": [
     {
-      "address": "0x5e7ad460032d7237c28aa27db70901a8b9cbb78a2dd852923dec36f2a838dcc",
-      "class_hash": "0x52240e991018e59149e7b8c1d9deac51267f1b24c21f507e0754ebbfc6e39e2",
+      "address": "0x4500f0488753027421fbbee2c4bad7f408a9d77de4d6459a00f7ed588a8cf35",
+      "class_hash": "0x3a78b2d23bbd2f2caff28a4c095c571e5c701ae59fb0f6bef385a6c5c4cda9",
       "abi": [
         {
           "type": "impl",
@@ -1521,27 +1521,21 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x5be0a05a5df3bd3b4fc17f8b1feb395cb463ced20ea41d4fbb9b86a4d7efc66",
+      "class_hash": "0x70a7526316719bcf9ea880494566fa4dac6a5c907b3abd81abea14b69478f85",
       "tag": "dojo_starter-Moved",
       "selector": "0x504403e5c02b6442527721fc464d9ea5fc8f1ee600ab5ccd5c0845d36fd45f1"
     },
     {
       "members": [],
-      "class_hash": "0x1562bba4e095a96f247905861a03d6954a907fbd3bb117fa522797aa0656835",
-      "tag": "dojo_starter-PlayerSpawned",
-      "selector": "0x5ae774f30c57741d65d258b45cd664de99fec5e031870df61757751a1cece4f"
+      "class_hash": "0x2daa1a5a8d9cb773c02eb45795e0a8049f4ffd8dbae86a833d5c8c6c7cd6023",
+      "tag": "dojo_starter-StartGame",
+      "selector": "0x9e56e5ce2211b059281cc86f37df44d810ee735db1fad373dec140acfcbb1"
     },
     {
       "members": [],
-      "class_hash": "0x2b0cb7bff4a57fc968d5a93ef6e2bde86828ed8cec7266cf7e4fd7a16324406",
-      "tag": "dojo_starter-TreasureFound",
-      "selector": "0x531771423c5c76086b089fd2df2aa9de0d7903e5245f40eace5465cd8d256d6"
-    },
-    {
-      "members": [],
-      "class_hash": "0x33f28f60c93c0ddbd4bbd63b9cbf93af202eedee49939af4d80ce9bf6289c84",
-      "tag": "dojo_starter-Warning",
-      "selector": "0x482a1296596230fb0969551d0544ba34687c10208690ff0801358c4d2522a91"
+      "class_hash": "0x3ef8e6941dba4e186227dc715f690eb19c42305205e121e3c38e6a944bfc67f",
+      "tag": "dojo_starter-WinGame",
+      "selector": "0x22625764bb664f74bc8b8f378391c729e8d86467f3254ed123c98f909d6f2a4"
     }
   ]
 }

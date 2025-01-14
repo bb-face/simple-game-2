@@ -44,17 +44,27 @@ interface Warning__FastWin {
   block_number: number;
 }
 
-interface PlayerSpawned {
+interface StartGame {
   fieldOrder: string[];
   player: string;
+  grid: Grid;
   timestamp: number;
+  block_number: number;
 }
 
-interface TreasureFound {
+interface WinGame {
   fieldOrder: string[];
   player: string;
   timestamp: number;
-  treasure_position: Vec2;
+  block_number: number;
+}
+
+interface Moved {
+  fieldOrder: string[];
+  player: string;
+  direction: Direction;
+  timestamp: number;
+  block_number: number;
 }
 
 interface TreasurePosition {
@@ -104,10 +114,11 @@ type Schema = {
     Moves: Moves;
     DirectionsAvailable: DirectionsAvailable;
     Position: Position;
-    TreasureFound: TreasureFound;
-    PlayerSpawned: PlayerSpawned;
+    WinGame: WinGame;
+    StartGame: StartGame;
     Warning__FastWin: Warning__FastWin;
     TreasurePosition: TreasurePosition;
+    Moved: Moved;
     Grid: Grid;
   };
 };
@@ -119,10 +130,11 @@ enum Models {
   Moves = "dojo_starter-Moves",
   DirectionsAvailable = "dojo_starter-DirectionsAvailable",
   Position = "dojo_starter-Position",
-  TreasureFound = "dojo_starter-TreasureFound",
+  WinGame = "dojo_starter-WinGame",
   TreasurePosition = "dojo_starter-TreasurePosition",
-  PlayerSpawned = "dojo_starter-PlayerSpawned",
+  StartGame = "dojo_starter-StartGame",
   Grid = "dojo_starter-Grid",
+  Moved = "dojo_starter-Moved",
 }
 
 const schema: Schema = {
@@ -134,6 +146,13 @@ const schema: Schema = {
       last_direction: Direction.None,
       can_move: false,
     },
+    Moved: {
+      fieldOrder: ["player", "direction", "timestamp", "block_number"],
+      player: "",
+      direction: Direction.None,
+      timestamp: 0,
+      block_number: 0,
+    },
     DirectionsAvailable: {
       fieldOrder: ["player", "directions"],
       player: "",
@@ -144,21 +163,32 @@ const schema: Schema = {
       player: "",
       vec: { x: 0, y: 0 },
     },
-    TreasureFound: {
-      fieldOrder: ["player", "timestamp", "treasure_position"],
+    WinGame: {
+      fieldOrder: ["player", "timestamp", "block_number"],
       player: "",
       timestamp: 0,
-      treasure_position: { x: 0, y: 0 },
+      block_number: 0,
     },
     TreasurePosition: {
       fieldOrder: ["player", "vec"],
       player: "",
       vec: { x: 0, y: 0 },
     },
-    PlayerSpawned: {
-      fieldOrder: ["player", "timestamp"],
+    StartGame: {
+      fieldOrder: ["player", "grid", "timestamp", "block_number"],
       player: "",
+      grid: {
+        fieldOrder: [],
+        player: "",
+        width: 0,
+        height: 0,
+        treasure_position: { x: 0, y: 0 },
+        player_initial_position: { x: 0, y: 0 },
+        starting_block: 0,
+        walls: [],
+      },
       timestamp: 0,
+      block_number: 0,
     },
     Warning__FastWin: {
       fieldOrder: ["player", "timestamp", "block_number"],
@@ -192,10 +222,11 @@ export type {
   Moves,
   DirectionsAvailable,
   Position,
-  PlayerSpawned,
+  StartGame,
   Warning__FastWin,
-  TreasureFound,
+  WinGame,
   TreasurePosition,
+  Moved,
   Vec2,
   Grid,
 };

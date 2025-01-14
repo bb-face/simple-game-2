@@ -1,16 +1,18 @@
-use dojo::event::EventStorage;
-use dojo::model::{ModelStorage, ModelValueStorage};
-use dojo_starter::models::{Vec2, Grid, Direction};
-use starknet::{ContractAddress, get_caller_address, get_block_number};
-
 pub mod proof_of_speed {
+    use starknet::{ContractAddress, get_block_number};
+    use dojo_starter::models::{Vec2, Grid, Direction};
+    use dojo::event::EventStorage;
+    use dojo::model::{ModelStorage, ModelValueStorage};
+    use dojo::world::WorldStorage;
+
     #[derive(Drop, Serde)]
     #[dojo::event]
-    pub struct PlayerSpawned {
+    pub struct StartGame {
         #[key]
         pub player: ContractAddress,
-        pub timestamp: u64,
         pub grid: Grid,
+        pub timestamp: u64,
+        pub block_number: u64,
     }
 
     #[derive(Copy, Drop, Serde)]
@@ -19,21 +21,37 @@ pub mod proof_of_speed {
         #[key]
         pub player: ContractAddress,
         pub direction: Direction,
+        pub timestamp: u64,
+        pub block_number: u64,
     }
 
     #[derive(Copy, Drop, Serde)]
     #[dojo::event]
-    pub struct TreasureFound {
+    pub struct WinGame {
         #[key]
         pub player: ContractAddress,
-        pub treasure_position: Vec2,
         pub timestamp: u64,
+        pub block_number: u64,
     }
 
-    fn start_game(world: WorldStorage, player: ContractAddress, grid: Grid) {
+    fn start_game(ref world: WorldStorage, player: ContractAddress, grid: Grid) {
         let timestamp = get_block_number();
         let block_number = get_block_number();
 
-        world.emit_event(@PlayerSpawned { player, timestamp, grid });
+        world.emit_event(@StartGame { player, grid, timestamp, block_number, });
+    }
+
+    fn move_player(ref world: WorldStorage, player: ContractAddress, direction: Direction) {
+        let timestamp = get_block_number();
+        let block_number = get_block_number();
+
+        world.emit_event(@Moved { player, direction, timestamp, block_number });
+    }
+
+    fn win_game(ref world: WorldStorage, player: ContractAddress) {
+        let timestamp = get_block_number();
+        let block_number = get_block_number();
+
+        world.emit_event(@WinGame { player, timestamp, block_number });
     }
 }
