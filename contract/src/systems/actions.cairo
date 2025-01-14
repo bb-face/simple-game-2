@@ -1,4 +1,5 @@
 use dojo_starter::models::{Direction, Position, Grid};
+use super::proof_of_speed;
 
 #[starknet::interface]
 trait IActions<T> {
@@ -15,40 +16,7 @@ pub mod actions {
     use dojo::model::{ModelStorage, ModelValueStorage};
     use dojo::event::EventStorage;
 
-    #[derive(Drop, Serde)]
-    #[dojo::event]
-    pub struct PlayerSpawned {
-        #[key]
-        pub player: ContractAddress,
-        pub timestamp: u64,
-        pub grid: Grid,
-    }
-
-    #[derive(Copy, Drop, Serde)]
-    #[dojo::event]
-    pub struct Moved {
-        #[key]
-        pub player: ContractAddress,
-        pub direction: Direction,
-    }
-
-    #[derive(Copy, Drop, Serde)]
-    #[dojo::event]
-    pub struct TreasureFound {
-        #[key]
-        pub player: ContractAddress,
-        pub treasure_position: Vec2,
-        pub timestamp: u64,
-    }
-
-    #[derive(Copy, Drop, Serde)]
-    #[dojo::event]
-    pub struct Warning__FastWin {
-        #[key]
-        pub player: ContractAddress,
-        pub timestamp: u64,
-        pub block_number: u64,
-    }
+    use super::proof_of_speed::{start_game};
 
     #[derive(Copy, Drop, Serde)]
     struct Wall {
@@ -174,12 +142,13 @@ pub mod actions {
 
             world.write_model(@moves);
 
-            world
-                .emit_event(
-                    @PlayerSpawned {
-                        player, timestamp: starknet::get_block_timestamp(), grid: grid
-                    }
-                );
+            proof_of_speed::start_game(world, player, grid);
+            // world
+        //     .emit_event(
+        //         @PlayerSpawned {
+        //             player, timestamp: starknet::get_block_timestamp(), grid: grid
+        //         }
+        //     );
         }
 
         fn move(ref self: ContractState, direction: Direction) {
@@ -201,31 +170,29 @@ pub mod actions {
                 moves.last_direction = direction;
                 world.write_model(@moves);
 
-                world.emit_event(@Moved { player, direction });
+                // world.emit_event(@Moved { player, direction });
 
                 if (next.vec.x == treasure_position.vec.x
                     && next.vec.y == treasure_position.vec.y) {
                     let current_block = starknet::get_block_number();
 
-                    if (current_block - grid.starting_block < 10_u64) {
-                        world
-                            .emit_event(
-                                @Warning__FastWin {
-                                    player,
-                                    timestamp: starknet::get_block_timestamp(),
-                                    block_number: current_block,
-                                }
-                            );
+                    if (current_block - grid.starting_block < 10_u64) { // world
+                    //     .emit_event(
+                    //         @Warning__FastWin {
+                    //             player,
+                    //             timestamp: starknet::get_block_timestamp(),
+                    //             block_number: current_block,
+                    //         }
+                    //     );
                     }
-
-                    world
-                        .emit_event(
-                            @TreasureFound {
-                                player,
-                                treasure_position: treasure_position.vec,
-                                timestamp: starknet::get_block_timestamp()
-                            }
-                        );
+                    //world
+                //    .emit_event(
+                //        @TreasureFound {
+                //            player,
+                //            treasure_position: treasure_position.vec,
+                //            timestamp: starknet::get_block_timestamp()
+                //        }
+                //    );
                 }
             } else {
                 // still count the move

@@ -1,5 +1,6 @@
 mod systems {
     mod actions;
+    mod proof_of_speed;
 }
 
 mod models;
