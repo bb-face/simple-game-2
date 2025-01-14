@@ -1,13 +1,11 @@
 use dojo_starter::models::{Direction, Position, Grid};
 
-// define the interface
 #[starknet::interface]
 trait IActions<T> {
     fn spawn(ref self: T);
     fn move(ref self: T, direction: Direction);
 }
 
-// dojo decorator
 #[dojo::contract]
 pub mod actions {
     use super::{IActions, Direction, Position, next_position};
@@ -138,12 +136,9 @@ pub mod actions {
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
         fn spawn(ref self: ContractState) {
-            // Get the default world.
             let mut world = self.world_default();
 
-            // Get the address of the current caller, possibly the player's address.
             let player = get_caller_address();
-            // Retrieve the player's current position from the world.
             let position: Position = world.read_model(player);
 
             let new_position_vector = Vec2 { x: position.vec.x + 10, y: position.vec.y + 10 };
@@ -169,17 +164,14 @@ pub mod actions {
                 walls,
             };
 
-            // Write the new position to the world.
             world.write_model(@new_position);
             world.write_model(@new_treasure_position);
             world.write_model(@grid);
 
-            // 2. Set the player's remaining moves to 100.
             let moves = Moves {
                 player, remaining: 100, last_direction: Direction::None(()), can_move: true
             };
 
-            // Write the new moves to the world.
             world.write_model(@moves);
 
             world
@@ -190,34 +182,27 @@ pub mod actions {
                 );
         }
 
-        // Implementation of the move function for the ContractState struct.
         fn move(ref self: ContractState, direction: Direction) {
             let mut world = self.world_default();
             let player = get_caller_address();
 
-            // Read models
             let position: Position = world.read_model(player);
             let treasure_position: TreasurePosition = world.read_model(player);
             let mut moves: Moves = world.read_model(player);
             let grid: Grid = world.read_model(player);
 
-            // Calculate the next position
             let next = next_position(position, direction);
 
-            // Check if the next position contains a wall
             if !is_wall(grid.walls, next.vec) {
                 // Only update position if there's no wall
                 world.write_model(@next);
 
-                // Update moves
                 moves.remaining -= 1;
                 moves.last_direction = direction;
                 world.write_model(@moves);
 
-                // Emit move event
                 world.emit_event(@Moved { player, direction });
 
-                // Check treasure collection
                 if (next.vec.x == treasure_position.vec.x
                     && next.vec.y == treasure_position.vec.y) {
                     let current_block = starknet::get_block_number();
@@ -262,7 +247,6 @@ pub mod actions {
     }
 }
 
-// Define function like this:
 fn next_position(mut position: Position, direction: Direction) -> Position {
     match direction {
         Direction::None => { return position; },
