@@ -142,7 +142,7 @@ pub mod actions {
             let position: Position = world.read_model(player);
 
             let new_position_vector = Vec2 { x: position.vec.x + 10, y: position.vec.y + 10 };
-            let new_treasure_position_vector = Vec2 { x: 11, y: 11 };
+            let new_treasure_position_vector = Vec2 { x: 16, y: 16 };
 
             let new_position = Position { player, vec: new_position_vector };
             let new_treasure_position = TreasurePosition {
