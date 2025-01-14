@@ -1,5 +1,5 @@
 use dojo_starter::models::{Direction, Position, Grid};
-use super::proof_of_speed::proof_of_speed::{start_game, move_player, win_game};
+use super::proof_of_speed::proof_of_speed::{start_game, record_action, win_game};
 
 
 #[starknet::interface]
@@ -12,12 +12,12 @@ trait IActions<T> {
 pub mod actions {
     use super::{IActions, Direction, Position, next_position};
     use starknet::{ContractAddress, get_caller_address, get_block_number};
-    use dojo_starter::models::{Vec2, Moves, DirectionsAvailable, TreasurePosition, Grid};
+    use dojo_starter::models::{Vec2, Moves, DirectionsAvailable, TreasurePosition, Grid, Game};
 
     use dojo::model::{ModelStorage, ModelValueStorage};
     use dojo::event::EventStorage;
 
-    use super::{start_game, move_player, win_game};
+    use super::{start_game, record_action, win_game};
 
     #[derive(Copy, Drop, Serde)]
     struct Wall {
@@ -141,9 +141,14 @@ pub mod actions {
                 player, remaining: 100, last_direction: Direction::None(()), can_move: true
             };
 
-            world.write_model(@moves);
+            let game_id = starknet::get_block_number().into();
 
-            start_game(ref world, player, grid);
+            let game = Game { player, game_id, };
+
+            world.write_model(@moves);
+            world.write_model(@game);
+
+            start_game(ref world, player, game_id);
             // world
         //     .emit_event(
         //         @PlayerSpawned {
@@ -156,6 +161,7 @@ pub mod actions {
             let mut world = self.world_default();
             let player = get_caller_address();
 
+            let game: Game = world.read_model(player);
             let position: Position = world.read_model(player);
             let treasure_position: TreasurePosition = world.read_model(player);
             let mut moves: Moves = world.read_model(player);
@@ -171,7 +177,12 @@ pub mod actions {
                 moves.last_direction = direction;
                 world.write_model(@moves);
 
-                move_player(ref world, player, direction);
+                // Explicitly use the implementation from models
+                let direction_felt: felt252 = dojo_starter::models::DirectionIntoFelt252::into(
+                    direction
+                );
+
+                record_action(ref world, player, game.game_id, direction_felt);
                 // world.emit_event(@Moved { player, direction });
 
                 if (next.vec.x == treasure_position.vec.x
@@ -188,7 +199,7 @@ pub mod actions {
                     //     );
                     }
 
-                    win_game(ref world, player);
+                    win_game(ref world, player, game.game_id);
                     //world
                 //    .emit_event(
                 //        @TreasureFound {

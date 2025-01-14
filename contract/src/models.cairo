@@ -2,6 +2,14 @@ use starknet::ContractAddress;
 
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
+pub struct Game {
+    #[key]
+    pub player: ContractAddress,
+    pub game_id: felt252,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
 pub struct Moves {
     #[key]
     pub player: ContractAddress,

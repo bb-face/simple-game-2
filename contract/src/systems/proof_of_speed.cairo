@@ -1,8 +1,6 @@
 pub mod proof_of_speed {
     use starknet::{ContractAddress, get_block_number};
-    use dojo_starter::models::{Vec2, Grid, Direction};
     use dojo::event::EventStorage;
-    use dojo::model::{ModelStorage, ModelValueStorage};
     use dojo::world::WorldStorage;
 
     #[derive(Drop, Serde)]
@@ -10,17 +8,18 @@ pub mod proof_of_speed {
     pub struct StartGame {
         #[key]
         pub player: ContractAddress,
-        pub grid: Grid,
+        pub game_id: felt252,
         pub timestamp: u64,
         pub block_number: u64,
     }
 
     #[derive(Copy, Drop, Serde)]
     #[dojo::event]
-    pub struct Moved {
+    pub struct GameAction {
         #[key]
         pub player: ContractAddress,
-        pub direction: Direction,
+        pub game_id: felt252,
+        pub action_type: felt252,
         pub timestamp: u64,
         pub block_number: u64,
     }
@@ -30,28 +29,31 @@ pub mod proof_of_speed {
     pub struct WinGame {
         #[key]
         pub player: ContractAddress,
+        pub game_id: felt252,
         pub timestamp: u64,
         pub block_number: u64,
     }
 
-    fn start_game(ref world: WorldStorage, player: ContractAddress, grid: Grid) {
+    fn start_game(ref world: WorldStorage, player: ContractAddress, game_id: felt252) {
         let timestamp = get_block_number();
         let block_number = get_block_number();
 
-        world.emit_event(@StartGame { player, grid, timestamp, block_number, });
+        world.emit_event(@StartGame { player, game_id, timestamp, block_number });
     }
 
-    fn move_player(ref world: WorldStorage, player: ContractAddress, direction: Direction) {
+    fn record_action(
+        ref world: WorldStorage, player: ContractAddress, game_id: felt252, action_type: felt252
+    ) {
         let timestamp = get_block_number();
         let block_number = get_block_number();
 
-        world.emit_event(@Moved { player, direction, timestamp, block_number });
+        world.emit_event(@GameAction { player, game_id, action_type, timestamp, block_number });
     }
 
-    fn win_game(ref world: WorldStorage, player: ContractAddress) {
+    fn win_game(ref world: WorldStorage, player: ContractAddress, game_id: felt252) {
         let timestamp = get_block_number();
         let block_number = get_block_number();
 
-        world.emit_event(@WinGame { player, timestamp, block_number });
+        world.emit_event(@WinGame { player, game_id, timestamp, block_number });
     }
 }
